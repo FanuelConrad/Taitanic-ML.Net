@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using BetterConsoleTables;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Transforms;
@@ -75,8 +74,6 @@ namespace Taitanic_ML.Net
             //step 7: use a fasttree trainer
             .Append(mlContext.BinaryClassification.Trainers.FastTree());
 
-            //WritePipeline(mlContext, trainingDataView, pipeline, 10);
-
             // train the model
             Console.WriteLine("Training model...");
             var trainedModel = pipeline.Fit(trainingDataView);
@@ -132,40 +129,6 @@ namespace Taitanic_ML.Net
 
         }
 
-        /// <summary>
-        /// Helper method to write the machine learning pipeline to the console.
-        /// </summary>
-        /// <param name="mlContext">The machine learning context.</param>
-        /// <param name="dataView">The data view object holding the data.</param>
-        /// <param name="pipeline">The machine learning pipeline.</param>
-        /// <param name="numberOfRows">The maximum number of rows to write.</param>
-        public static void WritePipeline(MLContext mlContext,IDataView dataView,IEstimator<ITransformer>pipeline,int numberOfRows = 4)
-        {
-            //helper method to write a value to the console table
-            object WriteValue(object value)
-            {
-                if (value is VBuffer<float>)
-                    return "<vector>";
-                else
-                    return value;
-            }
-
-            //get a preview of the transformed data
-            var transformer = pipeline.Fit(dataView);
-            var transformedData = transformer.Transform(dataView);
-            var preview = transformedData.Preview(maxRows: numberOfRows);
-
-            //set up a console table
-            var table = new Table(TableConfiguration.Unicode(),
-                (from c in preview.ColumnView select c.Column.Name).ToArray().ToString());
-
-            // fill the table with results
-            foreach (var row in preview.RowView)
-                table.AddRow((from c in row.Values select WriteValue(c.Value)).ToArray());
-
-            //write the table
-            Console.WriteLine(table.ToString());
-        }
     }
 
     //The RawAge class is a helper class for a column transformation
